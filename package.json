@@ -1,0 +1,36 @@
+{
+  "name": "ds-plus",
+  "version": "1.0.0",
+  "description": "Desenvolver uma solução de Ciência de Dados e Business Intelligence para auxiliar uma pequena empreendedora na organização, acompanhamento e análise das vendas de lanches, utilizando os dados gerados pelos pedidos para facilitar a gestão do negócio e apoiar a tomada de decisões.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --experimental-strip-types --test tests/domain.test.ts",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Thalys-T/DS-Plus.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Thalys-T/DS-Plus/issues"
+  },
+  "homepage": "https://github.com/Thalys-T/DS-Plus#readme",
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  }
+}
