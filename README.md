@@ -3,7 +3,7 @@ Desenvolver uma solução de Ciência de Dados e Business Intelligence para auxi
 
 ## Protótipo em React e TypeScript
 
-Interface responsiva em português com visão geral, cadastro de produtos, novo pedido e histórico de vendas. Desenvolvido com React, TypeScript e Vite. Ícones: Lucide. Fontes: DM Sans e Manrope, carregadas do Google Fonts com alternativa local sans-serif.
+Interface responsiva em português com visão geral, **painel de análises (BI)**, cadastro de produtos, novo pedido e histórico de vendas. Desenvolvido com React, TypeScript e Vite. Ícones: Lucide. Fontes: DM Sans e Manrope, carregadas do Google Fonts com alternativa local sans-serif.
 
 ### Executar
 
@@ -33,6 +33,19 @@ npm test        # verifica regras de negócio
 7. Selecione o período e exporte um CSV. O arquivo contém uma linha por item e apenas vendas concluídas que atendem aos filtros.
 8. Recarregue a página para verificar a persistência dos dados reais.
 
+### Painel de análises (BI)
+
+A página **Análises** recalcula os indicadores a cada pedido registrado, sempre sobre as vendas concluídas do período escolhido (atalhos: Hoje, 7, 30 e 90 dias):
+
+- Faturamento, pedidos e ticket médio comparados ao período anterior de mesma duração.
+- **O que os dados dizem**: conclusões automáticas em linguagem simples (horário de pico, melhor dia, produtos-chave, menos vendidos, pagamento preferido, variação e cancelamentos).
+- Faturamento por dia, pedidos por horário, faturamento médio por dia da semana e mapa de movimento (dia da semana × hora).
+- Participação das formas de pagamento e das categorias.
+- **Curva ABC**: classe A = produtos que somam 80% do faturamento, B = até 95%, C = restante (inclui produtos ativos sem venda).
+- **Sugestão de produção para amanhã**: média vendida de cada produto nos mesmos dias da semana das últimas 4 semanas.
+
+A demonstração gera 60 dias de vendas fictícias com padrões plausíveis (picos no café da manhã, almoço e noite; sábado reduzido; domingo fechado), sempre iguais por usar semente fixa.
+
 ### Regras e armazenamento
 
 - Valores armazenados como centavos inteiros; quantidades inteiras positivas.
@@ -51,9 +64,11 @@ Este é um esboço funcional local, sem backend, banco compartilhado ou autentic
 
 - `src/App.tsx`: telas e fluxo de uso.
 - `src/domain.ts`: tipos, cálculos, CSV e dados fictícios.
+- `src/analytics.ts`: indicadores do painel de análises, curva ABC, sugestão de produção e conclusões automáticas.
+- `src/Dashboard.tsx` e `src/charts.tsx`: página de análises e gráficos em SVG/HTML, sem bibliotecas externas.
 - `src/styles.css`: identidade visual e adaptação para celular.
-- `tests/domain.test.ts`: testes das regras de cálculo, validação, histórico, indicadores, CSV e fuso horário.
+- `tests/domain.test.ts` e `tests/analytics.test.ts`: testes das regras de cálculo, validação, histórico, indicadores, análises, CSV e fuso horário.
 
 ### Próximas etapas
 
-API e banco de dados persistente, autenticação da empreendedora, backup/restauração e dashboard analítico com produtos, horários e evolução das vendas. Validar o fluxo presencialmente com a parceira antes de ampliar o escopo.
+API e banco de dados persistente, autenticação da empreendedora, backup/restauração e publicação para uso no celular. Validar o fluxo presencialmente com a parceira antes de ampliar o escopo.
