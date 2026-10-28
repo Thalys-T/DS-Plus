@@ -1,89 +1,78 @@
 # DS+
 
-Primeira etapa funcional do DS+: aplicação local para cadastro de produtos, registro de pedidos e consulta de vendas para uma operação de lanches.
+Desenvolver uma solução de Ciência de Dados e Business Intelligence para auxiliar uma pequena empreendedora na organização, acompanhamento e análise das vendas de lanches, utilizando os dados gerados pelos pedidos para facilitar a gestão do negócio e apoiar a tomada de decisões.
 
-## Tecnologias
+## Protótipo em React e TypeScript
 
-- Python 3.11+
-- Streamlit (interface)
-- SQLite (persistência local)
-- Pytest (testes de regras principais)
+Interface responsiva em português com visão geral, cadastro de produtos, novo pedido e histórico de vendas. Desenvolvido com React, TypeScript e Vite. Ícones: Lucide. Fontes: DM Sans e Manrope, carregadas do Google Fonts com alternativa local sans-serif.
 
-## Estrutura
+### Executar
 
-- `/app.py`: interface Streamlit com as telas **Produtos**, **Novo pedido** e **Histórico de vendas**.
-- `/dsplus/database.py`: criação e inicialização do SQLite.
-- `/dsplus/service.py`: regras de negócio (validações, totais, status, resumo e exportação CSV).
-- `/tests/test_service.py`: testes unitários das regras principais.
-- `/data/`: pasta usada para o banco local (`dsplus.db`), gerado em execução.
+Requer Node.js 22.12+ (testado com Node.js 24) e npm.
 
-Separação adotada:
-- Interface: Streamlit (`app.py`)
-- Regras de negócio: `DSPlusService`
-- Acesso a dados: `Database` + SQL em transações
+```sh
+npm install
+npm run dev
+```
 
-## Instalação
+Abra o endereço local exibido no terminal, normalmente http://127.0.0.1:5173.
+
+```sh
+npm run build   # valida TypeScript e gera dist/
+npm run preview # serve a versão de produção localmente
+npm test        # verifica regras de negócio
+```
+
+### Experimentar
+
+1. Clique em **Experimentar demonstração** para visualizar produtos e vendas fictícios. Este modo usa apenas memória, fica sinalizado na interface e não altera seus dados reais. Recarregar a página encerra a demonstração.
+2. Clique em **Voltar aos meus dados** para começar seu próprio cadastro.
+3. Em **Produtos**, adicione dois produtos com preços e categorias.
+4. Em **Novo pedido**, adicione os itens, ajuste as quantidades, escolha o pagamento e registre como concluído ou pendente.
+5. Consulte o histórico, abra os detalhes para concluir um pedido pendente ou cancelar um pedido. Cancelamentos preservam o registro e não podem ser reabertos nesta versão.
+6. Edite o preço ou desative um produto. Os pedidos anteriores preservam nome, categoria e preço da venda.
+7. Selecione o período e exporte um CSV. O arquivo contém uma linha por item e apenas vendas concluídas que atendem aos filtros.
+8. Recarregue a página para verificar a persistência dos dados reais.
+
+### Regras e armazenamento
+
+- Valores armazenados como centavos inteiros; quantidades inteiras positivas.
+- Faturamento, quantidade e ticket médio consideram somente pedidos concluídos do período. Filtros adicionais de status/pagamento afetam a tabela e o CSV, não os cartões de resumo.
+- Datas apresentadas e filtradas no fuso America/Sao_Paulo.
+- Pagamentos são apenas registrados, sem cobrança ou integração bancária.
+- Dados reais são gravados em um único documento no **localStorage**, chave `ds-plus-v1`. Pedido e itens são salvos juntos; a interface confirma o registro apenas se a gravação for bem-sucedida.
+- O modo demonstração é separado e começa somente mediante ação explícita.
+- Não há dados pessoais ou credenciais nos exemplos.
+
+### Limitações desta versão
+
+Este é um esboço funcional local, sem backend, banco compartilhado ou autenticação. Os dados pertencem ao navegador e à origem usada para abrir a aplicação (endereço e porta). Limpar o armazenamento remove os registros. Abas simultâneas e múltiplos usuários não são suportados; use uma única aba para registrar vendas. O CSV exporta vendas, mas não substitui um backup completo do cadastro. Não usar como sistema definitivo de produção antes de implementar banco, backup, autenticação e controle de concorrência.
+
+### Organização
+
+- `src/App.tsx`: telas e fluxo de uso.
+- `src/domain.ts`: tipos, cálculos, CSV e dados fictícios.
+- `src/styles.css`: identidade visual e adaptação para celular.
+- `tests/domain.test.ts`: testes das regras de cálculo, validação, histórico, indicadores, CSV e fuso horário.
+
+## Alternativa local em Python + Streamlit
+
+Também há uma implementação local em Python/Streamlit com SQLite nos arquivos:
+
+- `app.py`
+- `dsplus/database.py`
+- `dsplus/service.py`
+- `tests/test_service.py`
+
+Execução:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-```
-
-## Execução
-
-```bash
 streamlit run app.py
 ```
 
-A aplicação abre no navegador local.
+## Próximas etapas
 
-## Roteiro de uso
-
-1. Acesse **Produtos** e cadastre pelo menos 2 produtos.
-2. Vá em **Novo pedido**, selecione itens e quantidades, escolha forma de pagamento e salve.
-3. Em **Histórico de vendas**, filtre período/status/pagamento, conclua ou cancele pedidos pendentes e veja os indicadores.
-4. Use o botão de exportação CSV para baixar vendas concluídas do período selecionado.
-
-## Regras implementadas
-
-- Produtos: cadastrar, listar, editar e desativar.
-- Preço e quantidade validados (sem negativo e quantidade > 0).
-- Pedidos sem itens são bloqueados.
-- Pedido + itens salvos em transação única.
-- Preço, nome e categoria do produto são gravados no item para preservar histórico.
-- Produtos inativos não aparecem para novos pedidos.
-- Prevenção de duplicidade por clique repetido no salvar pedido via `request_key` único.
-- Resumo considera somente pedidos concluídos.
-- Fuso de apresentação/filtro: `America/Sao_Paulo`.
-
-## Exportação CSV
-
-Exporta apenas pedidos concluídos do período selecionado, com uma linha por item contendo:
-
-- ID do pedido
-- Data e horário
-- ID e nome do produto
-- Categoria
-- Quantidade
-- Preço unitário praticado
-- Subtotal do item
-- Forma de pagamento
-
-## Testes
-
-```bash
-pytest -q
-```
-
-Cobertura do escopo solicitado:
-- cálculo de totais,
-- validação de quantidades,
-- preservação de preço histórico,
-- exclusão de pedidos cancelados dos indicadores.
-
-## Limitações desta etapa
-
-- Não inclui loja virtual, delivery, integração com WhatsApp, pagamentos online, estoque, IA preditiva ou dashboard avançado.
-- Uso local sem autenticação.
-- Publicação com acesso via internet exige etapa própria de autenticação e implantação.
+API e banco de dados persistente compartilhado, autenticação da empreendedora, backup/restauração e dashboard analítico com produtos, horários e evolução das vendas. Validar o fluxo presencialmente com a parceira antes de ampliar o escopo.

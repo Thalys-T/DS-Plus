@@ -1,6 +1,13 @@
 __pycache__/
 *.py[cod]
-*.db
 .venv/
 .pytest_cache/
 .streamlit/
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.local
+*.db
+*.sqlite
