@@ -6,7 +6,3 @@ dist/
 *.local
 *.db
 *.sqlite
-
-# Notas locais do assistente (não versionar)
-CLAUDE.md
-.claude/
