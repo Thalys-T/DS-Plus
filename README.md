@@ -1,4 +1,5 @@
 # DS+
+
 Desenvolver uma solução de Ciência de Dados e Business Intelligence para auxiliar uma pequena empreendedora na organização, acompanhamento e análise das vendas de lanches, utilizando os dados gerados pelos pedidos para facilitar a gestão do negócio e apoiar a tomada de decisões.
 
 ## Protótipo em React e TypeScript
@@ -54,6 +55,24 @@ Este é um esboço funcional local, sem backend, banco compartilhado ou autentic
 - `src/styles.css`: identidade visual e adaptação para celular.
 - `tests/domain.test.ts`: testes das regras de cálculo, validação, histórico, indicadores, CSV e fuso horário.
 
-### Próximas etapas
+## Alternativa local em Python + Streamlit
 
-API e banco de dados persistente, autenticação da empreendedora, backup/restauração e dashboard analítico com produtos, horários e evolução das vendas. Validar o fluxo presencialmente com a parceira antes de ampliar o escopo.
+Também há uma implementação local em Python/Streamlit com SQLite nos arquivos:
+
+- `app.py`
+- `dsplus/database.py`
+- `dsplus/service.py`
+- `tests/test_service.py`
+
+Execução:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+## Próximas etapas
+
+API e banco de dados persistente compartilhado, autenticação da empreendedora, backup/restauração e dashboard analítico com produtos, horários e evolução das vendas. Validar o fluxo presencialmente com a parceira antes de ampliar o escopo.

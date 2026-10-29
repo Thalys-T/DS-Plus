@@ -1,3 +1,8 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.streamlit/
 node_modules/
 dist/
 .env
