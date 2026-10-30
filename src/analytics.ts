@@ -99,7 +99,8 @@ export function analyze(orders: Order[], products: Product[], from = '', to = ''
 }
 
 /** Sugestão de produção: média vendida de cada produto nos mesmos dias da semana das últimas `weeks` semanas. */
-export function suggestion(orders: Order[], target: string, weeks = 4) {
+export function suggestion(orders: Order[], target: string, products: Product[], weeks = 4) {
+  const activeProducts = new Map(products.filter(p => p.active).map(p => [p.id, p]));
   const sameDays = Array.from({ length: weeks }, (_, n) => addDays(target, -7 * (n + 1)));
   const quantities = new Map<string, { name: string; quantity: number }>();
   const daysWithSales = new Set<string>();
@@ -109,14 +110,16 @@ export function suggestion(orders: Order[], target: string, weeks = 4) {
     if (!sameDays.includes(d)) continue;
     daysWithSales.add(d);
     for (const i of o.items) {
-      const q = quantities.get(i.productId) ?? { name: i.name, quantity: 0 };
+      const product = activeProducts.get(i.productId);
+      if (!product) continue;
+      const q = quantities.get(i.productId) ?? { name: product.name, quantity: 0 };
       q.quantity += i.quantity; quantities.set(i.productId, q);
     }
   }
   const n = daysWithSales.size;
   return {
     weekday: weekdayOfDay(target), days: n,
-    products: n ? [...quantities.values()].map(q => ({ name: q.name, average: q.quantity / n, suggested: Math.ceil(q.quantity / n) })).sort((a, b) => b.average - a.average) : [],
+    products: n ? [...quantities].map(([id, q]) => ({ id, name: q.name, average: q.quantity / n, suggested: Math.ceil(q.quantity / n) })).sort((a, b) => b.average - a.average) : [],
   };
 }
 
@@ -130,12 +133,14 @@ export function insights(a: Analysis, previous: Analysis | null): string[] {
   const bestDay = a.weekday.reduce((best, w, i) => w.averageRevenue > a.weekday[best].averageRevenue ? i : best, 0);
   if (a.weekday.filter(w => w.days).length > 1) list.push(`${weekdayNames[bestDay][0].toUpperCase() + weekdayNames[bestDay].slice(1)} é o dia com maior faturamento médio (${money(a.weekday[bestDay].averageRevenue)} por dia).`);
   const classA = a.ranking.filter(p => p.abc === 'A');
-  if (classA.length) list.push(`${classA.length} de ${a.ranking.length} produtos (classe A) geram cerca de 80% do faturamento: ${classA.slice(0, 3).map(p => p.name).join(', ')}${classA.length > 3 ? '…' : ''}. Evite que faltem.`);
+  if (classA.length) list.push(`${classA.length} de ${a.ranking.length} produtos (classe A) geram ${pct(classA.reduce((sum, p) => sum + p.share, 0))} do faturamento: ${classA.slice(0, 3).map(p => p.name).join(', ')}${classA.length > 3 ? '…' : ''}. Evite que faltem.`);
   const unsold = a.ranking.filter(p => p.quantity === 0);
   const sold = a.ranking.filter(p => p.quantity > 0);
   if (unsold.length) list.push(`${unsold.length === 1 ? 'Um produto ativo não teve' : `${unsold.length} produtos ativos não tiveram`} vendas no período: ${unsold.slice(0, 3).map(p => p.name).join(', ')}.`);
-  else if (sold.length > 3) { const last = sold[sold.length - 1]; list.push(`O produto menos vendido foi ${last.name} (${last.quantity} un.). Avalie promoção, combo ou retirada do cardápio.`); }
-  if (a.payments[0]) list.push(`${a.payments[0].name} é a forma de pagamento mais usada (${pct(a.payments[0].share)} do faturamento).`);
+  else if (sold.length > 3) { const last = sold.reduce((least, p) => p.quantity < least.quantity ? p : least); list.push(`Entre os produtos com menor quantidade vendida está ${last.name} (${last.quantity} un.). Avalie promoção ou combo considerando também o período e a disponibilidade.`); }
+  const preferredPayments = a.payments.filter(p => p.count === Math.max(...a.payments.map(p => p.count)));
+  if (preferredPayments.length === 1) list.push(`${preferredPayments[0].name} é a forma de pagamento mais usada (${pct(preferredPayments[0].count / a.count)} dos pedidos).`);
+  else if (preferredPayments.length > 1) list.push(`${preferredPayments.map(p => p.name).join(', ')} empatam como formas de pagamento mais usadas (${preferredPayments[0].count} pedidos cada).`);
   const change = previous ? variation(a.revenue, previous.revenue) : null;
   if (change !== null && Math.abs(change) < 0.01) list.push('O faturamento ficou praticamente igual ao do período anterior de mesma duração.');
   else if (change !== null) list.push(`O faturamento ficou ${pct(Math.abs(change))} ${change >= 0 ? 'acima' : 'abaixo'} do período anterior de mesma duração.`);

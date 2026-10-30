@@ -12,7 +12,7 @@ export default function Dashboard({ orders, previous, allOrders, products, from,
   const before = useMemo(() => previous ? analyze(previous, products) : null, [previous, products]);
   const tips = useMemo(() => insights(a, before), [a, before]);
   const tomorrow = addDays(today, 1);
-  const plan = useMemo(() => suggestion(allOrders, tomorrow), [allOrders, tomorrow]);
+  const plan = useMemo(() => suggestion(allOrders, tomorrow, products), [allOrders, tomorrow, products]);
 
   if (!a.count) return <section className="panel empty dashboard-empty">
     <TrendingUp size={32} />
@@ -75,7 +75,7 @@ export default function Dashboard({ orders, previous, allOrders, products, from,
       <div className="panel-heading"><div><h2>Sugestão de produção para amanhã ({weekdayNames[plan.weekday]})</h2><p>{plan.days ? `Média vendida em ${plan.days} ${plan.days > 1 ? weekdayPlurals[plan.weekday] : weekdayNames[plan.weekday]} recente${plan.days > 1 ? 's' : ''} (últimas 4 semanas). Use como ponto de partida.` : 'Sem vendas registradas neste dia da semana nas últimas 4 semanas.'}</p></div><span className="icon-tile"><ChefHat size={18} /></span></div>
       {plan.products.length > 0 && <div className="table-scroll"><table>
         <thead><tr><th>Produto</th><th className="right">Média vendida</th><th className="right">Sugestão</th></tr></thead>
-        <tbody>{plan.products.map(p => <tr key={p.name}><td><strong>{p.name}</strong></td><td className="right">{p.average.toFixed(1).replace('.', ',')}</td><td className="right"><strong>{p.suggested} un.</strong></td></tr>)}</tbody>
+        <tbody>{plan.products.map(p => <tr key={p.id}><td><strong>{p.name}</strong></td><td className="right">{p.average.toFixed(1).replace('.', ',')}</td><td className="right"><strong>{p.suggested} un.</strong></td></tr>)}</tbody>
       </table></div>}
       <div className="panel-foot">Indicadores consideram apenas pedidos concluídos e são recalculados a cada novo registro. Datas no fuso de São Paulo.</div>
     </section>

@@ -91,4 +91,11 @@ streamlit run app.py
 ## Próximas etapas
 
 API e banco de dados persistente, autenticação da empreendedora, backup/restauração e publicação para uso no celular. Validar o fluxo presencialmente com a parceira antes de ampliar o escopo.
-API e banco de dados persistente compartilhado, autenticação da empreendedora, backup/restauração e dashboard analítico com produtos, horários e evolução das vendas. Validar o fluxo presencialmente com a parceira antes de ampliar o escopo.
+
+## Publicação na Vercel
+
+O arquivo `vercel.json` configura a publicação da aplicação React/Vite: instalação com `npm ci`, compilação com `npm run build` e saída estática em `dist`. O projeto usa Node.js 24.x. Não são necessárias variáveis de ambiente ou banco de dados para esta demonstração. A alternativa Python/Streamlit não é publicada neste site.
+
+Importe o repositório `Thalys-T/DS-Plus` na Vercel, mantenha a pasta raiz e o framework Vite e publique. Cada visitante começa com seus dados locais vazios e pode clicar em **Experimentar demonstração**. Os dados fictícios ficam separados dos cadastros do navegador.
+
+O roteiro para apresentar e validar os fluxos com o vendedor está em [docs/APRESENTACAO.md](docs/APRESENTACAO.md). A publicação não adiciona sincronização entre aparelhos ou backup em nuvem.

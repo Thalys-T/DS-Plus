@@ -1,0 +1,14 @@
+.git
+.venv
+__pycache__
+.pytest_cache
+.streamlit
+node_modules
+dist
+tests
+app.py
+dsplus
+requirements.txt
+*.db
+*.sqlite
+.env*

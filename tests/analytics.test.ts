@@ -63,7 +63,7 @@ test('sugestão de produção usa a média dos mesmos dias da semana', () => {
     order('2026-10-12T16:00:00Z', [item(products[0], 1)]),
     order('2026-10-20T15:00:00Z', [item(products[2], 9)]), // terça: não entra
   ];
-  const s = suggestion(orders, '2026-10-26');
+  const s = suggestion(orders, '2026-10-26', products);
   assert.equal(s.weekday, 1); assert.equal(s.days, 2);
   assert.deepEqual(s.products.map(p => [p.name, p.average, p.suggested]), [['Coxinha', 3, 3], ['Café', 0.5, 1]]);
 });
@@ -85,4 +85,32 @@ test('dados de demonstração são válidos e seguem o funcionamento do negócio
   assert.equal(db.orders.filter(o => o.status === 'Pendente').length, 1);
   assert.equal(demo(now).orders.length, db.orders.length, 'mesma semente gera os mesmos dados');
   assert.ok(insights(analyze(db.orders, db.products), null).length >= 4);
+});
+
+test('conclusões distinguem quantidade vendida e frequência de pagamento do faturamento', () => {
+  const catalog: Product[] = [
+    { id: 'a', name: 'Lanche', category: 'Lanches', price: 10000, active: true },
+    { id: 'b', name: 'Suco', category: 'Bebidas', price: 2000, active: true },
+    { id: 'c', name: 'Bolo', category: 'Doces', price: 1000, active: true },
+    { id: 'd', name: 'Bala', category: 'Doces', price: 10, active: true },
+  ];
+  const orders = catalog.map((p, i) => order('2026-10-23T15:00:00Z', [item(p, [1, 2, 3, 10][i])], i === 0 ? 'Dinheiro' : 'Pix'));
+  const text = insights(analyze(orders, catalog), null).join(' ');
+  assert.match(text, /menor quantidade vendida está Lanche \(1 un\.\)/);
+  assert.match(text, /Pix é a forma de pagamento mais usada \(75% dos pedidos\)/);
+  assert.doesNotMatch(text, /menos vendido foi Bala/);
+});
+
+test('empates de pagamento são apresentados sem escolher um vencedor por faturamento', () => {
+  const orders = [order('2026-10-23T15:00:00Z', [item(products[0], 10)], 'Pix'), order('2026-10-23T16:00:00Z', [item(products[1], 1)], 'Dinheiro')];
+  assert.match(insights(analyze(orders, products), null).join(' '), /empatam como formas de pagamento mais usadas \(1 pedidos cada\)/);
+});
+
+test('produção exclui inativos e usa o nome atual sem perder dias de referência', () => {
+  const history = [order('2026-10-19T15:00:00Z', [item(products[0], 2)]), order('2026-10-12T15:00:00Z', [item(products[3], 4)])];
+  const catalog = products.map(p => p.id === 'a' ? { ...p, name: 'Coxinha grande' } : p);
+  const plan = suggestion(history, '2026-10-26', catalog);
+  assert.equal(plan.days, 2);
+  assert.deepEqual(plan.products, [{ id: 'a', name: 'Coxinha grande', average: 1, suggested: 1 }]);
+  assert.deepEqual(suggestion(history, '2026-10-26', catalog.map(p => ({ ...p, active: false }))).products, []);
 });
